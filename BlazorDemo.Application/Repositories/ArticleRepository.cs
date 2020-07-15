@@ -36,5 +36,11 @@ namespace BlazorDemo.Application.Repositories
             return articleDataContext.SaveChangesAsync();
         }
 
+        public Task UpdateArticle(Article article)
+        {
+            articleDataContext.Articles.Attach(article);
+            return articleDataContext.SaveChangesAsync();
+        }
+
     }
 }
