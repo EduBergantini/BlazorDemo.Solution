@@ -1,0 +1,26 @@
+﻿@page "/articles/remove/{articleID}"
+@using Microsoft.Extensions.DependencyInjection
+@inherits OwningComponentBase
+@inject NavigationManager NavigationManager
+
+
+@code {
+    [Parameter]
+    public string ArticleID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        int articleId;
+        if (int.TryParse(ArticleID, out articleId))
+        {
+            var articleRepository = ScopedServices.GetRequiredService<ArticleRepository>();
+            var article = await articleRepository.GetArticlesAsync(a => a.Id == articleId);
+            if (article.Length != 0)
+            {
+                await articleRepository.RemoveArticle(article[0]);
+            }
+        }
+
+        NavigationManager.NavigateTo("articles/index", false);
+    }
+}

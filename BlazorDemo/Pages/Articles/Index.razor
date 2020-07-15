@@ -1,0 +1,48 @@
+﻿@page "/articles/index"
+@using Microsoft.Extensions.DependencyInjection
+@inherits OwningComponentBase
+
+<h1>Articles</h1>
+
+<NavLink class="nav-link" href="articles/create">
+    <span class="oi oi-list-rich" aria-hidden="true"></span> Create New
+</NavLink>
+
+@if(articles == null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+<ul class="article-list">
+    @foreach (Article item in articles)
+    {
+        <li>
+            <div>
+                <h3>@item.Title</h3>
+                <p>@item.Description</p>
+                <pre>@item.RegisterDate</pre>
+            </div>
+            <div>
+                <NavLink class="nav-link" href="@(this.BuildUrl("edit", item.Id))"> <span class="oi oi-pencil"></span> Editar </NavLink>|
+                <NavLink class="nav-link" href="@(this.BuildUrl("remove", item.Id))"> <span class="oi oi-ban"></span> Excluir </NavLink>
+            </div>
+        </li>
+    }
+</ul>
+}
+
+@code {
+    private Article[] articles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var articleRepository = ScopedServices.GetRequiredService<ArticleRepository>();
+        articles = await articleRepository.GetArticlesAsync();
+    }
+
+    public string BuildUrl(string action, int articleId)
+    {
+        return $"articles/{action}/{articleId}";
+    }
+}
