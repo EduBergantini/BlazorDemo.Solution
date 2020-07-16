@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BlazorDemo.Data;
 using BlazorDemo.Application.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +29,6 @@ namespace BlazorDemo
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
             services.AddDbContext<ArticleDataContext>(context => context.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<ArticleRepository>();
         }
