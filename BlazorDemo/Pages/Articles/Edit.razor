@@ -27,6 +27,16 @@
     <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
 
+<ul>
+    @foreach (var item in article.Paragraphs)
+    {
+        <li>
+            <p>@item.Content</p>
+            <img src="@item.ImageUrl" alt="Image" />
+        </li>
+    }
+</ul>
+
 @code {
     [Parameter]
     public string ArticleID { get; set; }
@@ -35,14 +45,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var articleRepository = ScopedServices.GetRequiredService<ArticleRepository>();
-        var articles = await articleRepository.GetArticlesAsync(x => x.Id == Convert.ToInt32(ArticleID));
-        if(articles.Length == 0)
+        int articleId;
+        if (int.TryParse(ArticleID, out articleId))
+        {
+            var articleRepository = ScopedServices.GetRequiredService<ArticleRepository>();
+            var articles = await articleRepository.GetArticlesAsync(x => x.Id == Convert.ToInt32(ArticleID));
+            if (articles.Length > 0)
+            {
+                this.article = articles[0];
+            }
+        }
+        else
         {
             NavigationManager.NavigateTo("articles/index", false);
         }
 
-        this.article = articles[0];
     }
 
     public async Task HandleValidSubmit()
