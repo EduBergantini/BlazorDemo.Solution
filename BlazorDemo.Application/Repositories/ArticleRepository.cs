@@ -20,8 +20,8 @@ namespace BlazorDemo.Application.Repositories
 
         public Task<Article[]> GetArticlesAsync(Expression<Func<Article, bool>> expression = null)
         {
-            if (expression == null) return articleDataContext.Articles.ToArrayAsync();
-            return articleDataContext.Articles.Where(expression).ToArrayAsync();
+            if (expression == null) return articleDataContext.Articles.Include(x => x.Paragraphs).ToArrayAsync();
+            return articleDataContext.Articles.Include(x => x.Paragraphs).Where(expression).ToArrayAsync();
         }
 
         public Task IncludeArticle(Article article)

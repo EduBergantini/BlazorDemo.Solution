@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorDemo.Application.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Blazored.Modal;
 
 namespace BlazorDemo
 {
@@ -31,6 +32,8 @@ namespace BlazorDemo
             services.AddServerSideBlazor();
             services.AddDbContext<ArticleDataContext>(context => context.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<ArticleRepository>();
+            services.AddScoped<ParagraphRepository>();
+            services.AddBlazoredModal();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

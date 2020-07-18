@@ -1,38 +1,46 @@
 ﻿@page "/articles/index"
+
 @using Microsoft.Extensions.DependencyInjection
+
+@inject IModalService Modal
+@inject NavigationManager NavMan
+
 @inherits OwningComponentBase
 
-<h1>Articles</h1>
+<h1>Artigos</h1>
 
 <NavLink class="nav-link" href="articles/create">
-    <span class="oi oi-list-rich" aria-hidden="true"></span> Create New
+    <span class="oi oi-list-rich" aria-hidden="true"></span> Novo Artigo
 </NavLink>
 
-@if(articles == null)
+@if (articles == null)
 {
     <p>Carregando...</p>
 }
 else
 {
-<ul class="article-list">
-    @foreach (Article item in articles)
-    {
-        <li>
-            <div>
-                <h3>@item.Title</h3>
-                <p>@item.Description</p>
-                <pre>@item.RegisterDate</pre>
-            </div>
-            <div>
-                <NavLink class="nav-link" href="@(this.BuildUrl("edit", item.Id))"> <span class="oi oi-pencil"></span> Editar </NavLink>|
-                <NavLink class="nav-link" href="@(this.BuildUrl("remove", item.Id))"> <span class="oi oi-ban"></span> Excluir </NavLink>
-            </div>
-        </li>
-    }
-</ul>
+    <ul class="article-list">
+        @foreach (Article item in articles)
+        {
+            <li>
+                <div>
+                    <h3>@item.Title</h3>
+                    <p>@item.Description</p>
+                    <pre>@item.RegisterDate</pre>
+                </div>
+                <div>
+                    <NavLink class="nav-link" href="@(this.BuildUrl("edit", item.Id))"> <span class="oi oi-pencil"></span> Editar </NavLink>|
+                    <button class="btn btn-default" @onclick="@(() => RemoveArticle(item.Id))"> <span class="oi oi-ban"></span> Excluir </button>
+                </div>
+            </li>
+        }
+    </ul>
 }
 
 @code {
+    [CascadingParameter]
+    public IModalService ModalService { get; set; }
+
     private Article[] articles;
 
     protected override async Task OnInitializedAsync()
@@ -41,8 +49,32 @@ else
         articles = await articleRepository.GetArticlesAsync();
     }
 
-    public string BuildUrl(string action, int articleId)
+    private string BuildUrl(string action, int articleId)
     {
         return $"articles/{action}/{articleId}";
+    }
+
+    private async Task RemoveArticle(int articleId)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(YesNoOption.Description), "Essa ação não pode ser desfeita e todo o conteúdo será perdido.");
+
+        var modalReference = ModalService.Show<YesNoOption>("Deseja remover esse artigo?", parameters);
+        var modalResult = await modalReference.Result;
+
+        if (!modalResult.Cancelled && (bool)modalResult.Data)
+        {
+            var articleRepository = ScopedServices.GetRequiredService<ArticleRepository>();
+            var articles = await articleRepository.GetArticlesAsync(x => x.Id == articleId);
+            if (articles.Length > 0)
+            {
+                await articleRepository.RemoveArticle(articles[0]);
+                NavMan.NavigateTo("/articles/index", true);
+            }
+            else
+            {
+                //TODO: Enviar mensagem de erro
+            }
+        }
     }
 }
