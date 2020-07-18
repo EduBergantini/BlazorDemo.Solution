@@ -35,5 +35,11 @@ namespace BlazorDemo.Application.Repositories
             articleDataContext.Paragraphs.Remove(paragraph);
             return articleDataContext.SaveChangesAsync();
         }
+
+        public Task UpdateParagraph(Paragraph paragraph)
+        {
+            articleDataContext.Paragraphs.Attach(paragraph);
+            return articleDataContext.SaveChangesAsync();
+        }
     }
 }

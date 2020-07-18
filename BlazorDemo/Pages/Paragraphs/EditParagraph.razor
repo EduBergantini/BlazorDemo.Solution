@@ -1,9 +1,9 @@
 ﻿@page "/articles/{ArticleID}/paragraphs/{ParagraphID}"
 
-@*@using Microsoft.Extensions.DependencyInjection
+@using Microsoft.Extensions.DependencyInjection
     @using BlazorDemo.Pages.Paragraphs
 
-    @inject NavigationManager NavigationManager
+    @inject NavigationManager NavMan
     @inject IModalService Modal
 
     @inherits OwningComponentBase
@@ -14,33 +14,49 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <input @bind-value="paragraph.articleId" type="hidden" />
-
         <div class="form-group">
-            <label for="Title">Title</label>
-            <InputText id="Title" @bind-Value="article.Title" class="form-control" placeholder="Enter the article title..." aria-describedby="titleHelp" />
-            <small id="titleHelp" class="form-text text-muted">Describe the title of your e-mail.</small>
+            <label for="Title">Conteúdo</label>
+            <InputText id="Title" @bind-Value="paragraph.Content" class="form-control" placeholder="Entre o conteúdo desse paragrafo...." aria-describedby="titleHelp" />
+            <small id="titleHelp" class="form-text text-muted">Entre o conteúdo desse paragrafo.</small>
         </div>
 
         <div class="form-group">
-            <label for="Description">Description</label>
-            <InputText id="Title" @bind-Value="article.Description" class="form-control" placeholder="Enter the article description..." aria-describedby="descHelp" />
-            <small id="descHelp" class="form-text text-muted">Describe the intent of your article in a few words.</small>
+            <label for="Description">Imagem</label>
+            <InputText id="Title" @bind-Value="paragraph.ImageUrl" class="form-control" placeholder="Anexe a imagem que melhor descreve esse paragrafo..." aria-describedby="descHelp" />
+            <small id="descHelp" class="form-text text-muted">Anexe a imagem que melhor descreve esse paragrafo.</small>
         </div>
 
         <button type="submit" class="btn btn-primary">Atualizar</button>
-    </EditForm>*@
+        <NavLink class="nav-link" href="@GetReturnUrl(ArticleID)">Voltar</NavLink>
+    </EditForm>
 
 @code {
     [Parameter] public string ArticleID { get; set; }
     [Parameter] public string ParagraphID { get; set; }
+    public Paragraph paragraph { get; set; }
 
+    protected override async Task  OnInitializedAsync()
+    {
+        var paragraphRepository = ScopedServices.GetRequiredService<ParagraphRepository>();
+        var paragraphs = await paragraphRepository.GetParagraphsAsync(x => x.Id == Convert.ToInt32(ParagraphID) && x.ArticleId == Convert.ToInt32(ArticleID));
+        if(paragraphs.Length == 0)
+        {
+            NavMan.NavigateTo(GetReturnUrl(ArticleID), false);
+            return;
+        }
 
+        paragraph = paragraphs[0];
+    }
 
-    //public async Task HandleValidSubmit()
-    //{
-    //    var paragraphRepository = ScopedServices.GetRequiredService<ParagraphRepository>();
-    //    //await paragraphRepository.UpdateArticle(article);
-    //    NavigationManager.NavigateTo("articles/index", false);
-    //}
+    public async Task HandleValidSubmit()
+    {
+        var paragraphRepository = ScopedServices.GetRequiredService<ParagraphRepository>();
+        await paragraphRepository.UpdateParagraph(paragraph);
+        NavMan.NavigateTo(GetReturnUrl(ArticleID), false);
+    }
+
+    private string GetReturnUrl(string articleId)
+    {
+        return $"/articles/edit/{ArticleID}";
+    }
 }
