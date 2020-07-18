@@ -1,0 +1,29 @@
+﻿
+
+<h5>@Description</h5>
+<div class="text-center">
+    <button class="btn btn-default" @onclick="ConfirmAction">Sim</button>
+    <button class="btn btn-danger" @onclick="CancelAction">Não</button>
+</div>
+
+
+@code {
+    [CascadingParameter] public BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter] public string Description { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private void ConfirmAction()
+    {
+        ModalInstance.Close(ModalResult.Ok<bool>(true));
+    }
+
+    private void CancelAction()
+    {
+        ModalInstance.Close(ModalResult.Ok<bool>(false));
+    }
+}

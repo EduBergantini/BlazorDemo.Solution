@@ -15,8 +15,8 @@ namespace BlazorDemo.Application.Repositories.Configurations
             builder.HasKey(paragraph => paragraph.Id);
             builder.Property(paragraph => paragraph.Id).HasColumnName("PRPH_ID").ValueGeneratedOnAdd();
             builder.Property(paragraph => paragraph.ArticleId).HasColumnName("ATCL_ID").IsRequired();
-            builder.Property(paragraph => paragraph.Content).HasColumnName("PRPH_CONTENT").HasMaxLength(60).IsRequired();
-            builder.Property(paragraph => paragraph.ImageUrl).HasColumnName("PRPH_IMGURL").HasMaxLength(150).IsRequired();
+            builder.Property(paragraph => paragraph.Content).HasColumnName("PRPH_CONTENT").IsRequired().HasColumnType("TEXT");
+            builder.Property(paragraph => paragraph.ImageUrl).HasColumnName("PRPH_IMGURL").HasMaxLength(150);
             builder.Property(paragraph => paragraph.IsActive).HasColumnName("PRPH_ACTIVE").IsRequired().HasDefaultValue(false);
             builder.Property(paragraph => paragraph.RegisterDate).HasColumnName("PRPH_REGDATE").IsRequired().HasDefaultValue(DateTime.Now);
 
